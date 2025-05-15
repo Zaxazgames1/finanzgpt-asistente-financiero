@@ -639,6 +639,198 @@ class StylesUI:
                 margin-top: 0.25rem;
             }
             
+            /* Estilos para las nuevas capacidades */
+            .capabilities {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+                margin: 2rem 0;
+                max-width: 600px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            .capability-card {
+                background: var(--bg-tertiary);
+                border: 1px solid var(--border-color);
+                border-radius: var(--radius-lg);
+                padding: 1rem;
+                display: flex;
+                align-items: flex-start;
+                gap: 0.75rem;
+                transition: var(--transition);
+            }
+            
+            .capability-card:hover {
+                border-color: var(--accent-blue);
+                transform: translateY(-2px);
+            }
+            
+            .capability-icon {
+                font-size: 1.5rem;
+                flex-shrink: 0;
+            }
+            
+            .capability-text strong {
+                display: block;
+                color: var(--text-primary);
+                font-size: 0.875rem;
+                margin-bottom: 0.25rem;
+            }
+            
+            .capability-text p {
+                color: var(--text-secondary);
+                font-size: 0.75rem;
+                line-height: 1.4;
+                margin: 0;
+            }
+            
+            /* Estilos para el CTA principal */
+            .main-cta {
+                background: linear-gradient(135deg, rgba(250, 139, 0, 0.1), rgba(139, 0, 250, 0.1));
+                border: 2px solid transparent;
+                background-origin: border-box;
+                border-radius: var(--radius-lg);
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                transition: var(--transition);
+            }
+            
+            .main-cta:hover {
+                border-color: var(--accent-blue);
+            }
+            
+            .cta-icon {
+                font-size: 2.5rem;
+                background: linear-gradient(135deg, #FA8B00, #8B00FA);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            
+            .cta-text h3 {
+                margin: 0 0 0.25rem 0;
+                color: var(--text-primary);
+                font-size: 1.125rem;
+                font-weight: 500;
+            }
+            
+            .cta-text p {
+                margin: 0;
+                color: var(--text-secondary);
+                font-size: 0.875rem;
+            }
+            
+            /* Grid de sugerencias mejorado */
+            .suggestions-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+            
+            /* Botón primario especial */
+            button[type="primary"] {
+                background: linear-gradient(135deg, #FA8B00, #8B00FA) !important;
+                color: white !important;
+                font-weight: 500 !important;
+                padding: 0.875rem 1.5rem !important;
+                font-size: 1rem !important;
+                border: none !important;
+                box-shadow: 0 4px 12px rgba(250, 139, 0, 0.3) !important;
+            }
+            
+            button[type="primary"]:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 6px 16px rgba(250, 139, 0, 0.4) !important;
+            }
+            
+            /* Animación de pensamiento */
+            .thinking-indicator {
+                display: flex;
+                align-items: center;
+                padding: 1rem 2rem;
+                margin-left: 3rem;
+            }
+            
+            .thinking-bubble {
+                background-color: transparent;
+                padding: 0.5rem 0;
+                display: flex;
+                gap: 0.3rem;
+                align-items: center;
+            }
+            
+            .thinking-dot {
+                width: 8px;
+                height: 8px;
+                background-color: var(--text-muted);
+                border-radius: 50%;
+                animation: thinking 1.4s ease-in-out infinite;
+            }
+            
+            .thinking-dot:nth-child(1) { animation-delay: 0s; }
+            .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+            .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+            
+            @keyframes thinking {
+                0%, 60%, 100% {
+                    transform: translateY(0);
+                    opacity: 0.4;
+                }
+                30% {
+                    transform: translateY(-10px);
+                    opacity: 1;
+                }
+            }
+            
+            /* Header del bot */
+            .bot-header {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-bottom: 0.5rem;
+                color: var(--text-secondary);
+                font-size: 0.875rem;
+            }
+            
+            .bot-header .bot-name {
+                font-weight: 500;
+                color: var(--text-primary);
+            }
+            
+            /* Acciones del mensaje */
+            .message-actions {
+                display: flex;
+                gap: 0.5rem;
+                margin-top: 0.75rem;
+                padding-top: 0.75rem;
+                border-top: 1px solid var(--border-color);
+            }
+            
+            .action-button {
+                padding: 0.375rem 0.75rem;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--border-color);
+                background: transparent;
+                color: var(--text-secondary);
+                font-size: 0.8125rem;
+                cursor: pointer;
+                transition: var(--transition);
+                display: flex;
+                align-items: center;
+                gap: 0.375rem;
+            }
+            
+            .action-button:hover {
+                background-color: var(--bg-tertiary);
+                color: var(--text-primary);
+                border-color: var(--text-muted);
+            }
+            
             /* Responsive */
             @media (max-width: 768px) {
                 .chat-container {
@@ -652,6 +844,15 @@ class StylesUI:
                 .chat-message-user,
                 .chat-message-bot {
                     padding: 0 1rem;
+                }
+                
+                .capabilities {
+                    grid-template-columns: 1fr;
+                }
+                
+                .main-cta {
+                    flex-direction: column;
+                    text-align: center;
                 }
             }
         </style>
