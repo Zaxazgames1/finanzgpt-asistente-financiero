@@ -40,10 +40,18 @@ class ConversationalAnalyzer:
             'ayuda', 'evaluar', 'revisar', 'estudiar', 'examinar',
             'diagnóstico', 'diagnostico', 'estado financiero',
             'situación financiera', 'indicadores', 'métricas',
-            'iniciar análisis', 'comenzar análisis', 'empezar análisis'
+            'iniciar análisis', 'comenzar análisis', 'empezar análisis',
+            'quiero analizar', 'necesito analizar', 'deseo analizar',
+            'evalúa', 'diagnostica', 'chequea', 'revisa finanzas'
         ]
         
         return any(palabra in mensaje_lower for palabra in palabras_clave_analisis)
+    
+    def detectar_intencion_tema_no_financiero(self, mensaje):
+        """Detecta si el usuario está preguntando sobre un tema no financiero"""
+        # Usar el método del servicio NLP para determinar si es un tema financiero
+        es_financiero, tipo = self.nlp_service.es_mensaje_financiero(mensaje)
+        return not es_financiero, tipo
     
     def procesar_respuesta(self, mensaje):
         """
@@ -51,6 +59,49 @@ class ConversationalAnalyzer:
         """
         estado_actual = st.session_state.estado_conversacion
         
+        # Detectar temas prohibidos directamente y responder con redirección
+        temas_prohibidos = [
+            # Comida y recetas
+            'receta', 'cocina', 'comida', 'desayuno', 'almuerzo', 'cena', 'plato', 'cocinado', 'cocinar',
+            'ingrediente', 'hornear', 'freír', 'asar', 'sopa', 'ensalada', 'postre', 'postres',
+            # Temas médicos detallados
+            'medicamento', 'medicina', 'tratamiento', 'enfermedad', 'síntoma', 'diagnóstico', 'cura',
+            # Viajes y reservas específicos
+            'hotel', 'reserva', 'vuelo', 'hospedaje', 'alojamiento', 'itinerario', 'ruta turística',
+            # Relaciones personales
+            'amor', 'divorcio', 'cita', 'matrimonio', 'novia', 'novio', 'pareja', 'ruptura', 'relación',
+            # Entretenimiento específico
+            'película', 'serie', 'episodio', 'canción', 'cantante', 'actor', 'actriz', 'director',
+            # Deportes específicos
+            'jugador', 'equipo', 'gol', 'campeonato', 'mundial', 'liga', 'partido', 'marcador',
+            # Tecnología detallada
+            'instalar', 'configurar', 'hardware', 'software', 'videojuego', 'consola'
+        ]
+        
+        mensaje_lower = mensaje.lower()
+        if any(tema in mensaje_lower for tema in temas_prohibidos):
+            return """Aprecio tu interés en este tema, pero como asistente financiero especializado, mi área de experiencia se centra exclusivamente en finanzas, economía y negocios. 
+
+Aunque me encantaría ayudarte con esta consulta específica, te puedo ser mucho más útil en temas como:
+
+• 📊 Análisis financiero empresarial
+• 💰 Gestión de presupuestos personales
+• 📈 Estrategias de inversión
+• 🏦 Productos bancarios y crediticios
+• 💼 Valoración de empresas y activos
+• 📑 Impuestos y planificación fiscal
+• 💸 Control de gastos y ahorro
+
+¿Te gustaría que exploremos alguno de estos temas financieros? ¿O quizás tienes alguna otra consulta relacionada con finanzas o economía en la que pueda ayudarte hoy?"""
+        
+        # Si es un tema no financiero y estamos en estado COMPLETADO o INICIO,
+        # generar una respuesta para temas no financieros pero mantener el estado
+        if estado_actual in [self.ESTADOS['COMPLETADO'], self.ESTADOS['INICIO']]:
+            es_no_financiero, tipo = self.detectar_intencion_tema_no_financiero(mensaje)
+            if es_no_financiero and tipo != "conversacional":
+                return self.nlp_service._respuesta_no_financiera(mensaje)
+        
+        # Continuar con el flujo de conversación normal
         if estado_actual == self.ESTADOS['INICIO']:
             return self._manejar_inicio(mensaje)
         elif estado_actual == self.ESTADOS['NOMBRE']:
@@ -417,6 +468,48 @@ Intenta de nuevo:"""
     
     def _manejar_completado(self, mensaje):
         """Maneja consultas después del análisis"""
+        # Detectar temas prohibidos directamente y responder con redirección
+        temas_prohibidos = [
+            # Comida y recetas
+            'receta', 'cocina', 'comida', 'desayuno', 'almuerzo', 'cena', 'plato', 'cocinado', 'cocinar',
+            'ingrediente', 'hornear', 'freír', 'asar', 'sopa', 'ensalada', 'postre', 'postres',
+            # Temas médicos detallados
+            'medicamento', 'medicina', 'tratamiento', 'enfermedad', 'síntoma', 'diagnóstico', 'cura',
+            # Viajes y reservas específicos
+            'hotel', 'reserva', 'vuelo', 'hospedaje', 'alojamiento', 'itinerario', 'ruta turística',
+            # Relaciones personales
+            'amor', 'divorcio', 'cita', 'matrimonio', 'novia', 'novio', 'pareja', 'ruptura', 'relación',
+            # Entretenimiento específico
+            'película', 'serie', 'episodio', 'canción', 'cantante', 'actor', 'actriz', 'director',
+            # Deportes específicos
+            'jugador', 'equipo', 'gol', 'campeonato', 'mundial', 'liga', 'partido', 'marcador',
+            # Tecnología detallada
+            'instalar', 'configurar', 'hardware', 'software', 'videojuego', 'consola'
+        ]
+        
+        mensaje_lower = mensaje.lower()
+        if any(tema in mensaje_lower for tema in temas_prohibidos):
+            return """Aprecio tu interés en este tema, pero como asistente financiero especializado, mi área de experiencia se centra exclusivamente en finanzas, economía y negocios. 
+
+Aunque me encantaría ayudarte con esta consulta específica, te puedo ser mucho más útil en temas como:
+
+• 📊 Análisis financiero empresarial
+• 💰 Gestión de presupuestos personales
+• 📈 Estrategias de inversión
+• 🏦 Productos bancarios y crediticios
+• 💼 Valoración de empresas y activos
+• 📑 Impuestos y planificación fiscal
+• 💸 Control de gastos y ahorro
+
+¿Te gustaría que exploremos alguno de estos temas financieros? ¿O quizás tienes alguna otra consulta relacionada con finanzas o economía en la que pueda ayudarte hoy?"""
+            
+        # Para temas no financieros enviamos una respuesta especial pero mantenemos
+        # el estado de conversación en COMPLETADO
+        es_no_financiero, tipo = self.detectar_intencion_tema_no_financiero(mensaje)
+        if es_no_financiero and tipo != "conversacional":
+            return self.nlp_service._respuesta_no_financiera(mensaje)
+            
+        # Para temas financieros o conversacionales, procesamos normalmente
         if 'datos_empresa' in st.session_state:
             return self.nlp_service.generar_respuesta_chat(mensaje, st.session_state.datos_empresa)
         else:

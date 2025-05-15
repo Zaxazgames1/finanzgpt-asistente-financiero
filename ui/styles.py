@@ -130,6 +130,41 @@ class StylesUI:
                 background-color: var(--accent-blue);
             }
             
+            /* Ajustes para los botones del chat */
+            .stButton > button[kind="primary"] {
+                background: linear-gradient(135deg, #FA8B00, #8B00FA) !important;
+                color: white !important;
+                font-weight: 500 !important;
+                padding: 0.875rem 1.5rem !important;
+                font-size: 1rem !important;
+                border: none !important;
+                border-radius: var(--radius-md) !important;
+                box-shadow: 0 4px 12px rgba(250, 139, 0, 0.3) !important;
+                text-align: center !important;
+            }
+            
+            .stButton > button[kind="primary"]:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 6px 16px rgba(250, 139, 0, 0.4) !important;
+            }
+            
+            /* Estilo para botones secundarios */
+            .stButton > button[kind="secondary"] {
+                background-color: var(--bg-tertiary) !important;
+                border: 1px solid var(--border-color) !important;
+                color: var(--text-primary) !important;
+                border-radius: var(--radius-md) !important;
+                padding: 0.75rem 1.25rem !important;
+                font-size: 0.875rem !important;
+                text-align: center !important;
+            }
+            
+            .stButton > button[kind="secondary"]:hover {
+                background-color: var(--bg-input) !important;
+                border-color: var(--accent-blue) !important;
+                color: var(--accent-blue) !important;
+            }
+            
             /* Forms estilo Gemini */
             .stTextInput > div > div > input,
             .stNumberInput > div > div > input,
@@ -157,26 +192,45 @@ class StylesUI:
                 box-shadow: 0 0 0 1px var(--accent-blue) !important;
             }
             
-            /* Select boxes */
-            .stSelectbox > div > div {
+            /* Chat input estilo Gemini - CORREGIDO */
+            .stChatInput {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background-color: var(--bg-primary);
+                border-top: 1px solid var(--border-color);
+                padding: 1rem 0;
+                z-index: 1000;
+            }
+            
+            .stChatInput > div {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 2rem;
+            }
+            
+            div[data-testid="stChatInput"] {
+                background-color: var(--bg-primary) !important;
+                padding: 1rem !important;
+            }
+            
+            div[data-testid="stChatInput"] > div {
                 background-color: var(--bg-input) !important;
                 border: 1px solid var(--border-color) !important;
-                border-radius: var(--radius-md) !important;
+                border-radius: var(--radius-lg) !important;
+            }
+            
+            div[data-testid="stChatInput"] textarea {
+                background-color: transparent !important;
+                border: none !important;
                 color: var(--text-primary) !important;
-                min-height: 38px !important;
+                font-size: 0.95rem !important;
+                padding: 0.75rem 1rem !important;
             }
             
-            .stSelectbox > div > div > div {
-                color: var(--text-primary) !important;
-            }
-            
-            .stSelectbox > div > div:hover {
-                border-color: var(--text-muted) !important;
-            }
-            
-            .stSelectbox > div > div:focus-within {
-                border-color: var(--accent-blue) !important;
-                box-shadow: 0 0 0 1px var(--accent-blue) !important;
+            div[data-testid="stChatInput"] textarea::placeholder {
+                color: var(--text-muted) !important;
             }
             
             /* Labels */
@@ -188,123 +242,6 @@ class StylesUI:
                 font-weight: 500 !important;
                 font-size: 0.875rem !important;
                 margin-bottom: 0.5rem !important;
-            }
-            
-            /* Chat input estilo Gemini */
-            .stChatInput {
-                background-color: var(--bg-primary) !important;
-                border-top: 1px solid var(--border-color);
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                z-index: 1000;
-                padding: 1rem 0;
-            }
-            
-            .stChatInput > div {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 0 2rem;
-            }
-            
-            .stChatInput > div > div > div > div {
-                background-color: var(--bg-input) !important;
-                border: 1px solid var(--border-color) !important;
-                border-radius: var(--radius-lg) !important;
-                box-shadow: var(--shadow-sm);
-            }
-            
-            .stChatInput textarea {
-                background-color: transparent !important;
-                border: none !important;
-                color: var(--text-primary) !important;
-                padding: 0.875rem 1.25rem !important;
-                font-size: 0.95rem !important;
-                font-family: inherit !important;
-                line-height: 1.5 !important;
-                resize: none !important;
-            }
-            
-            .stChatInput textarea:focus {
-                outline: none !important;
-                box-shadow: none !important;
-            }
-            
-            .stChatInput textarea::placeholder {
-                color: var(--text-muted) !important;
-            }
-            
-            /* Chat messages container */
-            .chat-container {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 2rem;
-                min-height: calc(100vh - 200px);
-                display: flex;
-                flex-direction: column;
-            }
-            
-            /* Chat messages */
-            .chat-message-user,
-            .chat-message-bot {
-                display: flex;
-                gap: 1rem;
-                margin-bottom: 2rem;
-                padding: 0 2rem;
-                max-width: 1200px;
-                width: 100%;
-                margin-left: auto;
-                margin-right: auto;
-            }
-            
-            .chat-message-user {
-                flex-direction: row-reverse;
-            }
-            
-            .message-content {
-                max-width: 70%;
-                padding: 0.875rem 1.25rem;
-                border-radius: var(--radius-lg);
-                line-height: 1.6;
-                font-size: 0.95rem;
-                word-wrap: break-word;
-            }
-            
-            .chat-message-user .message-content {
-                background-color: var(--bg-tertiary);
-                color: var(--text-primary);
-                border: 1px solid var(--border-color);
-            }
-            
-            .chat-message-bot .message-content {
-                background-color: transparent;
-                color: var(--text-primary);
-                padding-left: 0;
-                padding-right: 0;
-            }
-            
-            /* Avatars */
-            .avatar {
-                width: 32px;
-                height: 32px;
-                border-radius: var(--radius-full);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 0.875rem;
-                flex-shrink: 0;
-            }
-            
-            .avatar-user {
-                background-color: var(--bg-tertiary);
-                color: var(--text-primary);
-                border: 1px solid var(--border-color);
-            }
-            
-            .avatar-bot {
-                background: linear-gradient(135deg, #FA8B00, #8B00FA);
-                color: white;
             }
             
             /* Headers */
@@ -319,23 +256,6 @@ class StylesUI:
             h3 { font-size: 1.25rem; margin: 1rem 0 0.75rem 0; }
             h4 { font-size: 1.125rem; margin: 0.875rem 0 0.5rem 0; }
             
-            /* Main title */
-            .main-title {
-                font-size: 1.5rem;
-                font-weight: 500;
-                color: var(--text-primary);
-                text-align: center;
-                margin: 2rem 0 1rem 0;
-                letter-spacing: -0.01em;
-            }
-            
-            .sub-title {
-                font-size: 1rem;
-                color: var(--text-secondary);
-                text-align: center;
-                margin-bottom: 2rem;
-            }
-            
             /* Cards estilo Gemini */
             .card {
                 background-color: var(--bg-input);
@@ -348,20 +268,6 @@ class StylesUI:
             
             .card:hover {
                 border-color: var(--text-muted);
-            }
-            
-            /* Alerts */
-            .stAlert {
-                border-radius: var(--radius-md) !important;
-                border: 1px solid !important;
-                font-size: 0.9rem !important;
-                padding: 0.875rem 1rem !important;
-            }
-            
-            .stAlert[data-baseweb="notification"] {
-                background-color: rgba(0, 161, 241, 0.1) !important;
-                border-color: var(--accent-blue) !important;
-                color: var(--text-primary) !important;
             }
             
             /* Code blocks */
@@ -399,124 +305,6 @@ class StylesUI:
             
             ::-webkit-scrollbar-thumb:hover {
                 background-color: var(--text-muted);
-            }
-            
-            /* Canvas button estilo Gemini */
-            .canvas-button {
-                display: inline-flex;
-                align-items: center;
-                gap: 0.5rem;
-                padding: 0.625rem 1rem;
-                background-color: var(--bg-tertiary);
-                border: 1px solid var(--border-color);
-                border-radius: var(--radius-md);
-                color: var(--text-secondary);
-                font-size: 0.875rem;
-                cursor: pointer;
-                transition: var(--transition);
-            }
-            
-            .canvas-button:hover {
-                background-color: var(--bg-input);
-                color: var(--text-primary);
-                border-color: var(--text-muted);
-            }
-            
-            /* Form submit button */
-            .stFormSubmitButton > button {
-                background-color: var(--accent-blue) !important;
-                color: white !important;
-                border: none !important;
-                padding: 0.625rem 1.5rem !important;
-                border-radius: var(--radius-md) !important;
-                font-size: 0.95rem !important;
-                font-weight: 500 !important;
-                cursor: pointer !important;
-                transition: var(--transition) !important;
-            }
-            
-            .stFormSubmitButton > button:hover {
-                background-color: var(--primary-hover) !important;
-                transform: translateY(-1px);
-                box-shadow: var(--shadow-sm);
-            }
-            
-            /* Welcome screen estilo Gemini */
-            .welcome-container {
-                max-width: 800px;
-                margin: 0 auto;
-                padding: 3rem 2rem;
-                text-align: center;
-            }
-            
-            .welcome-icon {
-                font-size: 3rem;
-                margin-bottom: 1.5rem;
-                display: inline-block;
-                background: linear-gradient(135deg, #FA8B00, #8B00FA);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
-            
-            .welcome-title {
-                font-size: 2rem;
-                font-weight: 500;
-                color: var(--text-primary);
-                margin-bottom: 0.5rem;
-            }
-            
-            .welcome-subtitle {
-                font-size: 1.125rem;
-                color: var(--text-secondary);
-                max-width: 500px;
-                margin: 0 auto 2rem auto;
-                line-height: 1.6;
-            }
-            
-            /* Deep Research button */
-            .deep-research-button {
-                display: inline-flex;
-                align-items: center;
-                gap: 0.5rem;
-                padding: 0.625rem 1rem;
-                background-color: transparent;
-                border: 1px solid var(--border-color);
-                border-radius: var(--radius-full);
-                color: var(--text-secondary);
-                font-size: 0.875rem;
-                cursor: pointer;
-                transition: var(--transition);
-                margin-bottom: 1rem;
-            }
-            
-            .deep-research-button:hover {
-                background-color: var(--bg-tertiary);
-                color: var(--text-primary);
-                border-color: var(--text-muted);
-            }
-            
-            /* Info section */
-            .info-section {
-                background-color: var(--bg-tertiary);
-                border: 1px solid var(--border-color);
-                border-radius: var(--radius-lg);
-                padding: 1rem 1.5rem;
-                margin: 1rem 0;
-                display: flex;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-            
-            .info-icon {
-                color: var(--accent-blue);
-                font-size: 1.25rem;
-                flex-shrink: 0;
-            }
-            
-            .info-text {
-                color: var(--text-secondary);
-                font-size: 0.9rem;
-                line-height: 1.5;
             }
             
             /* Estados de análisis */
@@ -589,21 +377,6 @@ class StylesUI:
                 border-color: var(--text-muted);
             }
             
-            /* Recomendaciones */
-            .recomendacion {
-                background-color: var(--bg-tertiary);
-                border: 1px solid var(--border-color);
-                border-radius: var(--radius-md);
-                padding: 1rem 1.25rem;
-                margin-bottom: 0.75rem;
-                color: var(--text-primary);
-                transition: var(--transition);
-            }
-            
-            .recomendacion:hover {
-                border-color: var(--text-muted);
-            }
-            
             /* Form sections */
             .form-section {
                 background-color: var(--bg-input);
@@ -618,232 +391,38 @@ class StylesUI:
                 border-color: var(--text-muted);
             }
             
-            .form-title {
-                font-size: 1.125rem;
-                font-weight: 500;
-                color: var(--text-primary);
-                margin-bottom: 1.25rem;
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-            }
-            
-            .form-icon {
-                color: var(--accent-blue);
-                font-size: 1.25rem;
-            }
-            
-            .form-description {
-                font-size: 0.8125rem;
-                color: var(--text-muted);
-                margin-top: 0.25rem;
-            }
-            
-            /* Estilos para las nuevas capacidades */
-            .capabilities {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 1rem;
-                margin: 2rem 0;
-                max-width: 600px;
-                margin-left: auto;
-                margin-right: auto;
-            }
-            
-            .capability-card {
-                background: var(--bg-tertiary);
+            /* Canvas button */
+            .canvas-button {
+                background-color: var(--bg-tertiary);
                 border: 1px solid var(--border-color);
-                border-radius: var(--radius-lg);
-                padding: 1rem;
-                display: flex;
-                align-items: flex-start;
-                gap: 0.75rem;
-                transition: var(--transition);
-            }
-            
-            .capability-card:hover {
-                border-color: var(--accent-blue);
-                transform: translateY(-2px);
-            }
-            
-            .capability-icon {
-                font-size: 1.5rem;
-                flex-shrink: 0;
-            }
-            
-            .capability-text strong {
-                display: block;
-                color: var(--text-primary);
-                font-size: 0.875rem;
-                margin-bottom: 0.25rem;
-            }
-            
-            .capability-text p {
-                color: var(--text-secondary);
-                font-size: 0.75rem;
-                line-height: 1.4;
-                margin: 0;
-            }
-            
-            /* Estilos para el CTA principal */
-            .main-cta {
-                background: linear-gradient(135deg, rgba(250, 139, 0, 0.1), rgba(139, 0, 250, 0.1));
-                border: 2px solid transparent;
-                background-origin: border-box;
-                border-radius: var(--radius-lg);
-                padding: 1.5rem;
-                margin-bottom: 1.5rem;
-                display: flex;
-                align-items: center;
-                gap: 1rem;
-                transition: var(--transition);
-            }
-            
-            .main-cta:hover {
-                border-color: var(--accent-blue);
-            }
-            
-            .cta-icon {
-                font-size: 2.5rem;
-                background: linear-gradient(135deg, #FA8B00, #8B00FA);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
-            
-            .cta-text h3 {
-                margin: 0 0 0.25rem 0;
-                color: var(--text-primary);
-                font-size: 1.125rem;
-                font-weight: 500;
-            }
-            
-            .cta-text p {
-                margin: 0;
+                border-radius: var(--radius-md);
+                padding: 0.5rem 1rem;
                 color: var(--text-secondary);
                 font-size: 0.875rem;
-            }
-            
-            /* Grid de sugerencias mejorado */
-            .suggestions-grid {
-                display: grid;
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
-                max-width: 400px;
-                margin: 0 auto;
-            }
-            
-            /* Botón primario especial */
-            button[type="primary"] {
-                background: linear-gradient(135deg, #FA8B00, #8B00FA) !important;
-                color: white !important;
-                font-weight: 500 !important;
-                padding: 0.875rem 1.5rem !important;
-                font-size: 1rem !important;
-                border: none !important;
-                box-shadow: 0 4px 12px rgba(250, 139, 0, 0.3) !important;
-            }
-            
-            button[type="primary"]:hover {
-                transform: translateY(-2px) !important;
-                box-shadow: 0 6px 16px rgba(250, 139, 0, 0.4) !important;
-            }
-            
-            /* Animación de pensamiento */
-            .thinking-indicator {
-                display: flex;
-                align-items: center;
-                padding: 1rem 2rem;
-                margin-left: 3rem;
-            }
-            
-            .thinking-bubble {
-                background-color: transparent;
-                padding: 0.5rem 0;
-                display: flex;
-                gap: 0.3rem;
-                align-items: center;
-            }
-            
-            .thinking-dot {
-                width: 8px;
-                height: 8px;
-                background-color: var(--text-muted);
-                border-radius: 50%;
-                animation: thinking 1.4s ease-in-out infinite;
-            }
-            
-            .thinking-dot:nth-child(1) { animation-delay: 0s; }
-            .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
-            .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
-            
-            @keyframes thinking {
-                0%, 60%, 100% {
-                    transform: translateY(0);
-                    opacity: 0.4;
-                }
-                30% {
-                    transform: translateY(-10px);
-                    opacity: 1;
-                }
-            }
-            
-            /* Header del bot */
-            .bot-header {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                margin-bottom: 0.5rem;
-                color: var(--text-secondary);
-                font-size: 0.875rem;
-            }
-            
-            .bot-header .bot-name {
-                font-weight: 500;
-                color: var(--text-primary);
-            }
-            
-            /* Acciones del mensaje */
-            .message-actions {
-                display: flex;
-                gap: 0.5rem;
-                margin-top: 0.75rem;
-                padding-top: 0.75rem;
-                border-top: 1px solid var(--border-color);
-            }
-            
-            .action-button {
-                padding: 0.375rem 0.75rem;
-                border-radius: var(--radius-sm);
-                border: 1px solid var(--border-color);
-                background: transparent;
-                color: var(--text-secondary);
-                font-size: 0.8125rem;
                 cursor: pointer;
                 transition: var(--transition);
-                display: flex;
-                align-items: center;
-                gap: 0.375rem;
             }
             
-            .action-button:hover {
-                background-color: var(--bg-tertiary);
+            .canvas-button:hover {
+                background-color: var(--bg-input);
                 color: var(--text-primary);
                 border-color: var(--text-muted);
+            }
+            
+            /* Ajuste para mensajes del bot */
+            div[class*="message-"] pre {
+                background-color: var(--bg-tertiary) !important;
+                border: 1px solid var(--border-color) !important;
+                border-radius: var(--radius-md) !important;
+                padding: 1rem !important;
+                overflow-x: auto !important;
             }
             
             /* Responsive */
             @media (max-width: 768px) {
                 .chat-container {
                     padding: 1rem;
-                }
-                
-                .message-content {
-                    max-width: 85%;
-                }
-                
-                .chat-message-user,
-                .chat-message-bot {
-                    padding: 0 1rem;
+                    padding-bottom: 100px;
                 }
                 
                 .capabilities {
@@ -853,6 +432,10 @@ class StylesUI:
                 .main-cta {
                     flex-direction: column;
                     text-align: center;
+                }
+                
+                .message-content {
+                    max-width: 90%;
                 }
             }
         </style>

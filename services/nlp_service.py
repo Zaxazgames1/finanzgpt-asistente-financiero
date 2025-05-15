@@ -5,7 +5,7 @@ import random
 
 class NLPService:
     """
-    Servicio NLP usando Google Gemini 2.0 Flash API.
+    Servicio NLP usando Google Gemini 2.0 Flash API con enfoque en finanzas.
     """
     _instance = None
     _initialized = False
@@ -33,18 +33,50 @@ class NLPService:
             'Content-Type': 'application/json'
         }
         
+        # Lista de temas financieros para clasificación
+        self.temas_financieros = [
+            'finanza', 'empresa', 'dinero', 'capital', 'ganancia', 'presupuesto',
+            'deuda', 'rentabilidad', 'productividad', 'indicador', 'economía',
+            'endeudamiento', 'análisis', 'negocio', 'inversión', 'balance',
+            'contabilidad', 'impuesto', 'iva', 'crédito', 'préstamo', 'banca',
+            'ahorro', 'bolsa', 'acción', 'dividendo', 'interés', 'tasa',
+            'inflación', 'deflación', 'mercado', 'comercio', 'venta', 'compra',
+            'cliente', 'proveedor', 'factura', 'inventario', 'activo', 'pasivo',
+            'patrimonio', 'flujo', 'caja', 'liquidez', 'solvencia', 'quiebra', 
+            'seguro', 'riesgo', 'beneficio', 'costo', 'precio', 'margen', 'utilidad',
+            'pérdida', 'roe', 'roa', 'ebitda', 'capm', 'wacc', 'roi', 'van', 'tir',
+            'pib', 'pyme', 'startup', 'emprendimiento', 'accionista', 'socio',
+            'inversion', 'hipoteca', 'pension', 'jubilacion', 'salario', 'nomina'
+        ]
+        
+        # Palabras conversacionales comunes (permitidas aunque no sean de finanzas)
+        self.palabras_conversacionales = [
+            'hola', 'buenos días', 'buenas tardes', 'buenas noches', 'adiós', 
+            'gracias', 'por favor', 'cómo estás', 'qué tal', 'hasta luego',
+            'excelente', 'genial', 'perfecto', 'entiendo', 'claro', 'ok', 'bueno',
+            'ayuda', 'asistencia', 'explicación', 'ejemplo', 'duda', 'pregunta',
+            'respuesta', 'información', 'consejo', 'recomendación', 'guía',
+            'consejos', 'tiempo', 'nombre', 'colombia', 'bogotá', 'medellín', 'cali'
+        ]
+        
         print("✅ Gemini 2.0 Flash cargado exitosamente")
         NLPService._initialized = True
     
     def generar_respuesta_chat(self, mensaje, contexto_empresa=None):
         """
-        Genera respuestas excepcionales tipo ChatGPT en español.
+        Genera respuestas excepcionales tipo ChatGPT en español con enfoque financiero.
         """
         try:
+            # Verificar si el mensaje está relacionado con finanzas
+            es_tema_financiero, tipo_mensaje = self.es_mensaje_financiero(mensaje)
+            
             # Prompt del sistema
-            system_prompt = """Eres FinanzGPT, el mejor asistente financiero del mundo, similar a ChatGPT pero especializado en finanzas empresariales. 
+            system_prompt = """Eres FinanzGPT, el mejor asistente financiero del mundo, especializado en finanzas empresariales y personales. Tu propósito principal es ayudar con consultas financieras y económicas.
 
-IMPORTANTE: SIEMPRE responde en español perfecto y natural.
+IMPORTANTE: 
+- SIEMPRE responde en español perfecto y natural.
+- Tu especialidad son las FINANZAS. Si te preguntan sobre temas no relacionados con finanzas, economía o negocios, responde brevemente y guía la conversación de vuelta a temas financieros.
+- Nunca te niegues a responder completamente, pero reconoce tus limitaciones en temas no financieros.
 
 PERSONALIDAD Y ESTILO:
 - Eres extremadamente inteligente, amigable y profesional
@@ -53,6 +85,11 @@ PERSONALIDAD Y ESTILO:
 - Das respuestas detalladas pero bien estructuradas
 - Eres empático y entiendes las preocupaciones del usuario
 - Tienes sentido del humor sutil cuando es apropiado
+
+RESPUESTAS A TEMAS NO FINANCIEROS:
+- Para saludos/conversación casual: Responde normalmente y pregunta sobre necesidades financieras.
+- Para temas generales: Da una respuesta breve y educada, pero luego conecta con un tema financiero relacionado.
+- Para consultas totalmente fuera de tema: Responde brevemente, menciona amablemente que eres un asistente financiero y ofrece ayuda en ese ámbito.
 
 CAPACIDADES EXCEPCIONALES:
 1. Análisis financiero profundo y preciso
@@ -103,6 +140,13 @@ Usa estos datos para personalizar tus respuestas y dar consejos específicos.
 """
                 prompt_completo += contexto_detallado
             
+            # Añadir información sobre el tipo de mensaje
+            if not es_tema_financiero:
+                if tipo_mensaje == "conversacional":
+                    prompt_completo += f"\n\nTIPO DE MENSAJE: Conversacional general (saludo, cortesía). Responde normalmente y luego dirige hacia temas financieros."
+                else:
+                    prompt_completo += f"\n\nTIPO DE MENSAJE: No financiero. Responde brevemente y con amabilidad, pero recuerda que tu especialidad son las finanzas. Guía la conversación de vuelta a temas financieros."
+            
             # Añadir mensaje del usuario
             prompt_completo += f"\n\nUSUARIO: {mensaje}\n\nFINANZGPT (responde en español de forma excepcional):"
             
@@ -131,18 +175,48 @@ Usa estos datos para personalizar tus respuestas y dar consejos específicos.
                     
                     # Verificar que esté en español
                     if self._detectar_ingles(respuesta):
-                        return self._respuesta_premium_espanol(mensaje, contexto_empresa)
+                        return self._respuesta_premium_espanol(mensaje, contexto_empresa, es_tema_financiero)
                     
                     return respuesta
                 else:
-                    return self._respuesta_premium_espanol(mensaje, contexto_empresa)
+                    return self._respuesta_premium_espanol(mensaje, contexto_empresa, es_tema_financiero)
             else:
                 print(f"Error de API: {response.status_code} - {response.text}")
-                return self._respuesta_premium_espanol(mensaje, contexto_empresa)
+                return self._respuesta_premium_espanol(mensaje, contexto_empresa, es_tema_financiero)
                 
         except Exception as e:
             print(f"Error con Gemini: {e}")
-            return self._respuesta_premium_espanol(mensaje, contexto_empresa)
+            return self._respuesta_premium_espanol(mensaje, contexto_empresa, es_tema_financiero)
+    
+    def es_mensaje_financiero(self, mensaje):
+        """
+        Determina si un mensaje está relacionado con temas financieros.
+        
+        Args:
+            mensaje (str): El mensaje del usuario
+            
+        Returns:
+            tuple: (es_financiero, tipo_mensaje)
+        """
+        mensaje_lower = mensaje.lower()
+        palabras = mensaje_lower.split()
+        
+        # Detectar saludos y conversación casual
+        for palabra in self.palabras_conversacionales:
+            if palabra in mensaje_lower:
+                return False, "conversacional"
+        
+        # Detectar temas financieros
+        for tema in self.temas_financieros:
+            if tema in mensaje_lower:
+                return True, "financiero"
+        
+        # Verificar longitud - mensajes cortos suelen ser conversacionales
+        if len(palabras) <= 3:
+            return False, "conversacional"
+            
+        # Por defecto, asumir que no es un tema financiero
+        return False, "no_financiero"
     
     def _detectar_ingles(self, texto):
         """Detecta si la respuesta está en inglés."""
@@ -150,7 +224,7 @@ Usa estos datos para personalizar tus respuestas y dar consejos específicos.
         contador = sum(1 for palabra in palabras_ingles if palabra in texto.lower().split())
         return contador >= 3
     
-    def _respuesta_premium_espanol(self, mensaje, contexto_empresa):
+    def _respuesta_premium_espanol(self, mensaje, contexto_empresa=None, es_tema_financiero=True):
         """Respuestas premium en español cuando falla Gemini."""
         mensaje_lower = mensaje.lower().strip()
         
@@ -241,6 +315,10 @@ A veces, hablar sobre los desafíos financieros puede aliviar mucho el estrés. 
         if contexto_empresa and 'resultados' in contexto_empresa:
             return self._respuesta_contextual_premium(mensaje, contexto_empresa)
         
+        # RESPUESTAS PARA TEMAS NO FINANCIEROS
+        if not es_tema_financiero:
+            return self._respuesta_no_financiera(mensaje)
+        
         # RESPUESTA GENERAL INTELIGENTE
         return """Interesante consulta. Como tu asistente financiero especializado, puedo ayudarte mejor si me das un poco más de contexto sobre lo que necesitas.
 
@@ -267,6 +345,80 @@ A veces, hablar sobre los desafíos financieros puede aliviar mucho el estrés. 
 - Coberturas y seguros
 
 Cuéntame más sobre lo que necesitas y te daré la mejor asesoría posible."""
+    
+    def _respuesta_no_financiera(self, mensaje):
+        """Genera respuestas para temas no financieros, manteniendo siempre el enfoque financiero."""
+        mensaje_lower = mensaje.lower()
+        
+        # Lista de temas prohibidos a los que siempre responderemos con una redirección completa
+        temas_prohibidos = [
+            # Comida y recetas
+            'receta', 'cocina', 'comida', 'desayuno', 'almuerzo', 'cena', 'plato', 'cocinado', 'cocinar',
+            'ingrediente', 'hornear', 'freír', 'asar', 'sopa', 'ensalada', 'postre', 'postres',
+            # Temas médicos detallados
+            'medicamento', 'medicina', 'tratamiento', 'enfermedad', 'síntoma', 'diagnóstico', 'cura',
+            # Viajes y reservas específicos
+            'hotel', 'reserva', 'vuelo', 'hospedaje', 'alojamiento', 'itinerario', 'ruta turística',
+            # Relaciones personales
+            'amor', 'divorcio', 'cita', 'matrimonio', 'novia', 'novio', 'pareja', 'ruptura', 'relación',
+            # Entretenimiento específico
+            'película', 'serie', 'episodio', 'canción', 'cantante', 'actor', 'actriz', 'director',
+            # Deportes específicos
+            'jugador', 'equipo', 'gol', 'campeonato', 'mundial', 'liga', 'partido', 'marcador',
+            # Tecnología detallada
+            'instalar', 'configurar', 'hardware', 'software', 'videojuego', 'consola'
+        ]
+        
+        # Verificar si el mensaje contiene algún tema prohibido
+        if any(palabra in mensaje_lower for palabra in temas_prohibidos):
+            return """Aprecio tu interés en este tema, pero como asistente financiero especializado, mi área de experiencia se centra exclusivamente en finanzas, economía y negocios. 
+
+Aunque me encantaría ayudarte con esta consulta específica, te puedo ser mucho más útil en temas como:
+
+• 📊 Análisis financiero empresarial
+• 💰 Gestión de presupuestos personales
+• 📈 Estrategias de inversión
+• 🏦 Productos bancarios y crediticios
+• 💼 Valoración de empresas y activos
+• 📑 Impuestos y planificación fiscal
+• 💸 Control de gastos y ahorro
+
+¿Te gustaría que exploremos alguno de estos temas financieros? ¿O quizás tienes alguna otra consulta relacionada con finanzas o economía en la que pueda ayudarte hoy?"""
+        
+        # Para otros temas generales no financieros, pero no prohibidos
+        # Clima/Tiempo
+        if any(palabra in mensaje_lower for palabra in ['clima', 'lluvia', 'temperatura', 'soleado', 'frío', 'calor']):
+            return """El clima puede afectar muchos aspectos de nuestro día, ¡sin duda! 
+
+Hablando de pronósticos, ¿sabías que las proyecciones financieras funcionan de manera similar a los pronósticos del tiempo? Ambos analizan patrones históricos para predecir tendencias futuras.
+
+¿Te gustaría que analicemos las "proyecciones climáticas" de tu empresa para los próximos meses? Puedo ayudarte a preparar escenarios financieros para diferentes condiciones de mercado."""
+
+        # Tecnología/Gadgets - respuesta menos detallada
+        elif any(palabra in mensaje_lower for palabra in ['teléfono', 'telefono', 'móvil', 'movil', 'celular', 'computadora', 'pc', 'laptop', 'tablet', 'gadget']):
+            return """La tecnología avanza rapidísimo y tiene un impacto directo en nuestras finanzas. 
+
+Desde una perspectiva financiera, podríamos analizar:
+• El retorno de inversión (ROI) de adquisiciones tecnológicas
+• Estrategias para financiar compras de tecnología
+• Modelos de depreciación para equipos tecnológicos
+• Presupuestos para actualización de tecnología empresarial
+
+¿Te gustaría que exploremos alguno de estos aspectos financieros relacionados con la tecnología?"""
+
+        # Respuesta genérica para cualquier otro tema no financiero
+        return """Aprecio tu pregunta, aunque debo mencionar que mi especialidad son las finanzas y temas empresariales. 
+
+Puedo ofrecerte una orientación mucho más valiosa en temas como:
+• Análisis de rentabilidad de tu negocio
+• Estrategias para reducir costos operativos
+• Optimización de estructura financiera
+• Evaluación de inversiones y proyectos
+• Proyecciones financieras y presupuestos
+• Gestión de riesgos financieros
+• Valoración de empresas y activos
+
+¿Hay alguno de estos temas en los que pueda asistirte? Estoy aquí para ayudarte a tomar mejores decisiones financieras."""
     
     def _respuesta_contextual_premium(self, mensaje, contexto_empresa):
         """Respuestas premium cuando hay contexto de empresa."""
@@ -1106,29 +1258,6 @@ Multiple indicadores requieren intervención urgente. Aunque desafiante, esta si
         return palabras_importantes[:num_palabras]
     
     def es_mensaje_no_financiero(self, mensaje):
-        """Detecta si el mensaje no es financiero."""
-        mensaje_lower = mensaje.lower()
-        
-        # Saludos
-        if any(s in mensaje_lower for s in ['hola', 'hi', 'hey']):
-            return True, "saludo"
-        
-        # Despedidas
-        if any(d in mensaje_lower for d in ['adiós', 'adios', 'chao', 'bye']):
-            return True, "despedida"
-        
-        # Agradecimientos
-        if 'gracias' in mensaje_lower:
-            return True, "gracias"
-        
-        # Si contiene palabras financieras
-        palabras_financieras = [
-            'finanza', 'empresa', 'dinero', 'capital', 'ganancia',
-            'deuda', 'rentabilidad', 'productividad', 'indicador',
-            'endeudamiento', 'análisis', 'negocio', 'inversión'
-        ]
-        
-        if any(pf in mensaje_lower for pf in palabras_financieras):
-            return False, "financiero"
-        
-        return True, "otro"
+        """Detecta si el mensaje no es financiero (método legacy, mantenido por compatibilidad)."""
+        es_financiero, tipo = self.es_mensaje_financiero(mensaje)
+        return not es_financiero, tipo
