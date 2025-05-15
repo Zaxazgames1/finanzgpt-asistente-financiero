@@ -151,23 +151,25 @@ Tu empresa del sector **{resultados['sector']}** presenta el siguiente perfil fi
         # Si hay un análisis en curso, usar el analizador conversacional
         estado_conversacion = st.session_state.get('estado_conversacion', 'inicio')
         
-        if estado_conversacion != 'completado' and estado_conversacion != 'inicio':
+        # Procesar respuesta
+        respuesta = None
+        
+        if estado_conversacion == 'completado' and st.session_state.get('mostrar_analisis', False):
+            # Si hay que mostrar análisis, hacerlo inmediatamente
+            st.session_state.mostrar_analisis = False
+            self.renderizar_resultados_en_chat(st.session_state.datos_empresa['resultados'])
+            return None
+        elif estado_conversacion != 'completado' and estado_conversacion != 'inicio':
             respuesta = self.conversational_analyzer.procesar_respuesta(mensaje)
-            
-            # Si se completó el análisis, mostrar resultados
-            if st.session_state.estado_conversacion == 'completado' and st.session_state.mostrar_analisis:
-                st.session_state.mostrar_analisis = False
-                self.renderizar_resultados_en_chat(st.session_state.datos_empresa['resultados'])
-                st.rerun()
-            
-            return respuesta
         else:
             # Verificar si el usuario quiere iniciar un análisis
             if self.conversational_analyzer.detectar_intencion_analisis(mensaje):
-                return self.conversational_analyzer.procesar_respuesta(mensaje)
-            
-            # Usar el servicio NLP normal
-            return self.nlp_service.generar_respuesta_chat(mensaje, datos_empresa)
+                respuesta = self.conversational_analyzer.procesar_respuesta(mensaje)
+            else:
+                # Usar el servicio NLP normal
+                respuesta = self.nlp_service.generar_respuesta_chat(mensaje, datos_empresa)
+        
+        return respuesta
     
     def renderizar_chat(self, datos_empresa=None):
         """
@@ -337,8 +339,27 @@ Tu empresa del sector **{resultados['sector']}** presenta el siguiente perfil fi
                             </div>
                         """, unsafe_allow_html=True)
             
+            # Botón de emergencia para forzar el análisis
+            if st.session_state.get('estado_conversacion') == 'completado' and 'datos_empresa' in st.session_state:
+                if st.button("📊 Ver resultados del análisis", key="force_results", type="primary", use_container_width=True):
+                    self.renderizar_resultados_en_chat(st.session_state.datos_empresa['resultados'])
+                    st.rerun()
+            
             # Animación de pensamiento
             if st.session_state.thinking:
+                # Timeout de seguridad
+                if 'thinking_start' not in st.session_state:
+                    st.session_state.thinking_start = time.time()
+                
+                # Si lleva más de 5 segundos pensando, forzar resultado
+                if time.time() - st.session_state.thinking_start > 5:
+                    st.session_state.thinking = False
+                    st.session_state.thinking_start = None
+                    if st.session_state.get('mostrar_analisis', False):
+                        st.session_state.mostrar_analisis = False
+                        self.renderizar_resultados_en_chat(st.session_state.datos_empresa['resultados'])
+                    st.rerun()
+                
                 st.markdown("""
                     <div class="thinking-indicator">
                         <div class="avatar avatar-bot">🤖</div>
@@ -352,7 +373,7 @@ Tu empresa del sector **{resultados['sector']}** presenta el siguiente perfil fi
                 
                 # Si el estado es análisis, mostrar mensaje especial
                 if st.session_state.get('estado_conversacion') == 'analisis':
-                    time.sleep(3)  # Simular análisis
+                    time.sleep(2)  # Simular análisis
                     st.session_state.thinking = False
                     st.session_state.mostrar_analisis = True
                     st.rerun()
@@ -383,9 +404,14 @@ Tu empresa del sector **{resultados['sector']}** presenta el siguiente perfil fi
             # Generar respuesta
             respuesta = self.chatbot_response(ultimo_mensaje, datos_empresa)
             
-            # Agregar al historial
+            # Solo agregar respuesta si existe
             if respuesta:
                 st.session_state.chat_history.append(("bot", respuesta))
+            
+            # Si se debe mostrar análisis, hacerlo ahora
+            if st.session_state.get('mostrar_analisis', False):
+                st.session_state.mostrar_analisis = False
+                self.renderizar_resultados_en_chat(st.session_state.datos_empresa['resultados'])
             
             # Desactivar animación
             st.session_state.thinking = False
@@ -680,6 +706,9 @@ Tu empresa del sector **{resultados['sector']}** presenta el siguiente perfil fi
                 .avatar-bot {
                     background: linear-gradient(135deg, #FA8B00, #8B00FA);
                     color: white;
+                    .avatar-bot {
+                    background: linear-gradient(135deg, #FA8B00, #8B00FA);
+                    color: white;
                 }
                 
                 .bot-header {
@@ -819,6 +848,24 @@ Tu empresa del sector **{resultados['sector']}** presenta el siguiente perfil fi
                 /* Ajuste del contenedor principal para evitar que el contenido quede detrás del input */
                 .main > div {
                     padding-bottom: 80px !important;
+                }
+                
+                /* Estilos para el botón de emergencia */
+                button[data-testid="baseButton-primary"] {
+                    background: linear-gradient(135deg, #FA8B00, #8B00FA) !important;
+                    border: none !important;
+                    color: white !important;
+                    font-weight: 500 !important;
+                    padding: 0.75rem 1.5rem !important;
+                    border-radius: var(--radius-md) !important;
+                    transition: var(--transition) !important;
+                    transform: scale(1) !important;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+                }
+                
+                button[data-testid="baseButton-primary"]:hover {
+                    transform: translateY(-2px) scale(1.02) !important;
+                    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
                 }
                 
                 /* Animación de entrada */

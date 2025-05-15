@@ -391,15 +391,17 @@ Intenta de nuevo:"""
                 'mensaje': resultados.generar_mensaje()
             }
             
+            # Marcar que el análisis está completo y debe mostrarse
             st.session_state.estado_conversacion = self.ESTADOS['COMPLETADO']
+            st.session_state.mostrar_analisis = True
             
-            return """🔍 **Analizando los datos de tu empresa...**
+            return """🔍 **Análisis completado con éxito!**
 
-⚡ Calculando indicadores financieros...
-📊 Generando visualizaciones...
-💡 Preparando recomendaciones personalizadas...
+    ⚡ He calculado todos tus indicadores financieros
+    📊 He generado las visualizaciones
+    💡 He preparado recomendaciones personalizadas
 
-¡Tu análisis estará listo en unos segundos!"""
+    Aquí están los resultados de tu análisis:"""
             
         elif mensaje_lower in ['no', 'corregir', 'cambiar', 'modificar', 'editar']:
             st.session_state.estado_conversacion = self.ESTADOS['NOMBRE']
