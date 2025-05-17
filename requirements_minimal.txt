@@ -1,1 +1,0 @@
-'streamlit==1.30.0matplotlib==3.8.2numpy==1.26.3plotly==5.18.0google-generativeai==0.3.2requests==2.31.0' 
