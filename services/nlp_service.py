@@ -5,7 +5,7 @@ import random
 
 class NLPService:
     """
-    Servicio NLP usando Google Gemini 2.0 Flash API con enfoque en finanzas.
+    Servicio NLP usando Google Gemini 2.0 Flash API con enfoque EXCLUSIVO en finanzas.
     """
     _instance = None
     _initialized = False
@@ -33,8 +33,9 @@ class NLPService:
             'Content-Type': 'application/json'
         }
         
-        # Lista de temas financieros para clasificación
+        # Lista ampliada de temas financieros para clasificación
         self.temas_financieros = [
+            # Finanzas generales
             'finanza', 'empresa', 'dinero', 'capital', 'ganancia', 'presupuesto',
             'deuda', 'rentabilidad', 'productividad', 'indicador', 'economía',
             'endeudamiento', 'análisis', 'negocio', 'inversión', 'balance',
@@ -46,10 +47,19 @@ class NLPService:
             'seguro', 'riesgo', 'beneficio', 'costo', 'precio', 'margen', 'utilidad',
             'pérdida', 'roe', 'roa', 'ebitda', 'capm', 'wacc', 'roi', 'van', 'tir',
             'pib', 'pyme', 'startup', 'emprendimiento', 'accionista', 'socio',
-            'inversion', 'hipoteca', 'pension', 'jubilacion', 'salario', 'nomina'
+            'inversion', 'hipoteca', 'pension', 'jubilacion', 'salario', 'nomina',
+            # Términos específicos adicionales
+            'balance general', 'estado de resultados', 'flujo de efectivo',
+            'depreciación', 'amortización', 'apalancamiento', 'ratio', 'kpi',
+            'monetario', 'fiscal', 'tributario', 'gastos', 'ingresos', 'nómina',
+            'ventas', 'tesorería', 'ahorros', 'inversiones', 'dividendos', 
+            'accionistas', 'acciones', 'bonos', 'debentures', 'letras', 'pagarés',
+            'hipoteca', 'crédito', 'préstamo', 'leasing', 'factoring', 'subvención',
+            'impuestos', 'tributos', 'evasión', 'elusión', 'declaración', 'renta',
+            'depósito', 'cheque', 'transferencia', 'transacción', 'patrimonio'
         ]
         
-        # Palabras conversacionales comunes (permitidas aunque no sean de finanzas)
+        # Lista ampliada de palabras conversacionales comunes (permitidas aunque no sean de finanzas)
         self.palabras_conversacionales = [
             'hola', 'buenos días', 'buenas tardes', 'buenas noches', 'adiós', 
             'gracias', 'por favor', 'cómo estás', 'qué tal', 'hasta luego',
@@ -57,6 +67,44 @@ class NLPService:
             'ayuda', 'asistencia', 'explicación', 'ejemplo', 'duda', 'pregunta',
             'respuesta', 'información', 'consejo', 'recomendación', 'guía',
             'consejos', 'tiempo', 'nombre', 'colombia', 'bogotá', 'medellín', 'cali'
+        ]
+        
+        # Lista ampliada de temas prohibidos
+        self.temas_prohibidos = [
+            # Comida y recetas
+            'receta', 'cocina', 'comida', 'desayuno', 'almuerzo', 'cena', 'plato', 'cocinado', 'cocinar',
+            'ingrediente', 'hornear', 'freír', 'asar', 'sopa', 'ensalada', 'postre', 'postres', 'restaurante',
+            'bebida', 'café', 'té', 'pizza', 'hamburguesa', 'pastel', 'panadería', 'repostería',
+            # Temas médicos detallados
+            'medicamento', 'medicina', 'tratamiento', 'enfermedad', 'síntoma', 'diagnóstico', 'cura',
+            'doctor', 'médico', 'hospital', 'clínica', 'farmacia', 'receta médica', 'cirugía', 'operación',
+            'terapia', 'rehabilitación', 'salud', 'virus', 'bacteria', 'antibiótico', 'vacuna',
+            # Viajes y reservas específicos
+            'hotel', 'reserva', 'vuelo', 'hospedaje', 'alojamiento', 'itinerario', 'ruta turística',
+            'turismo', 'vacaciones', 'viaje', 'tour', 'aeropuerto', 'avión', 'crucero', 'destino',
+            'turista', 'playa', 'montaña', 'camping', 'mochilero', 'pasaporte', 'visa',
+            # Relaciones personales
+            'amor', 'divorcio', 'cita', 'matrimonio', 'novia', 'novio', 'pareja', 'ruptura', 'relación',
+            'boda', 'compromiso', 'anillo', 'romance', 'coqueteo', 'familia', 'hijo', 'hija', 'hermano',
+            'hermana', 'padre', 'madre', 'tío', 'tía', 'abuelo', 'abuela', 'primo', 'prima',
+            # Entretenimiento específico
+            'película', 'serie', 'episodio', 'canción', 'cantante', 'actor', 'actriz', 'director',
+            'cine', 'teatro', 'música', 'concierto', 'festival', 'baile', 'danza', 'libro', 'novela',
+            'autor', 'escritor', 'poeta', 'poesía', 'lectura', 'videojuego', 'juego', 'consola',
+            # Deportes específicos
+            'jugador', 'equipo', 'gol', 'campeonato', 'mundial', 'liga', 'partido', 'marcador',
+            'fútbol', 'baloncesto', 'tenis', 'béisbol', 'golf', 'atletismo', 'natación', 'gimnasio',
+            'ejercicio', 'entrenamiento', 'competición', 'medalla', 'récord', 'estadio', 'cancha',
+            # Tecnología detallada
+            'instalar', 'configurar', 'hardware', 'software', 'videojuego', 'consola', 'dispositivo',
+            'smartphone', 'laptop', 'tablet', 'ordenador', 'computadora', 'programación', 'código',
+            'desarrollo', 'app', 'aplicación', 'sistema operativo', 'red', 'internet', 'wifi',
+            # Otros temas alejados de finanzas
+            'noticia', 'política', 'religión', 'historia', 'filosofía', 'ciencia', 'arte', 'cultura',
+            'idioma', 'lenguaje', 'gramática', 'traducción', 'educación', 'escuela', 'universidad',
+            'moda', 'ropa', 'estilo', 'belleza', 'maquillaje', 'cosmética', 'hogar', 'decoración',
+            'jardinería', 'limpieza', 'mascotas', 'animales', 'películas', 'tv', 'chatgpt', 'inteligencia artificial',
+            'robot', 'gemini', 'poesía', 'chiste', 'broma', 'anime', 'videojuegos', 'cuento'
         ]
         
         print("✅ Gemini 2.0 Flash cargado exitosamente")
@@ -70,13 +118,17 @@ class NLPService:
             # Verificar si el mensaje está relacionado con finanzas
             es_tema_financiero, tipo_mensaje = self.es_mensaje_financiero(mensaje)
             
-            # Prompt del sistema
-            system_prompt = """Eres FinanzGPT, el mejor asistente financiero del mundo, especializado en finanzas empresariales y personales. Tu propósito principal es ayudar con consultas financieras y económicas.
+            # Si no es tema financiero ni conversacional, devolver respuesta estándar
+            if not es_tema_financiero and tipo_mensaje != "conversacional":
+                return self._respuesta_no_financiera(mensaje)
+            
+            # Prompt del sistema (mejorado para ser más estricto)
+            system_prompt = """Eres FinanzGPT, un asistente financiero altamente especializado, EXCLUSIVAMENTE enfocado en finanzas empresariales y personales. Tu propósito principal es ayudar con consultas financieras y económicas.
 
-IMPORTANTE: 
+RESTRICCIÓN CRÍTICA: 
+- SOLO responderás preguntas relacionadas con finanzas, economía o negocios.
+- Si te preguntan sobre CUALQUIER otro tema (comida, deportes, tecnología, entretenimiento, etc.), responderás amablemente que eres un asistente EXCLUSIVAMENTE financiero y redirigirás la conversación a temas financieros.
 - SIEMPRE responde en español perfecto y natural.
-- Tu especialidad son las FINANZAS. Si te preguntan sobre temas no relacionados con finanzas, economía o negocios, responde brevemente y guía la conversación de vuelta a temas financieros.
-- Nunca te niegues a responder completamente, pero reconoce tus limitaciones en temas no financieros.
 
 PERSONALIDAD Y ESTILO:
 - Eres extremadamente inteligente, amigable y profesional
@@ -84,12 +136,9 @@ PERSONALIDAD Y ESTILO:
 - Usas emojis de forma moderada para ser más cercano (👋 😊 📊 💰 ✅ 🎯 💡)
 - Das respuestas detalladas pero bien estructuradas
 - Eres empático y entiendes las preocupaciones del usuario
-- Tienes sentido del humor sutil cuando es apropiado
 
-RESPUESTAS A TEMAS NO FINANCIEROS:
-- Para saludos/conversación casual: Responde normalmente y pregunta sobre necesidades financieras.
-- Para temas generales: Da una respuesta breve y educada, pero luego conecta con un tema financiero relacionado.
-- Para consultas totalmente fuera de tema: Responde brevemente, menciona amablemente que eres un asistente financiero y ofrece ayuda en ese ámbito.
+RESPUESTA A TEMAS NO FINANCIEROS:
+Algo como: "Aprecio tu interés en este tema, pero como asistente financiero especializado, mi área de experiencia se centra exclusivamente en finanzas, economía y negocios. ¿Puedo ayudarte con alguna consulta relacionada con finanzas empresariales o personales?"
 
 CAPACIDADES EXCEPCIONALES:
 1. Análisis financiero profundo y preciso
@@ -105,18 +154,9 @@ FORMA DE RESPONDER:
 - Estructura tus respuestas con títulos y subtítulos cuando sea apropiado
 - Usa bullets y numeración para claridad
 - Incluye ejemplos concretos cuando sea útil
-- Ofrece seguimiento y preguntas adicionales
 - Termina con una pregunta o invitación a continuar la conversación
 
-CONOCIMIENTO EXPERTO EN:
-- Ratios financieros (endeudamiento, liquidez, rentabilidad)
-- Análisis de estados financieros
-- Gestión de flujo de caja
-- Optimización de costos
-- Estrategias de crecimiento
-- Gestión de riesgos
-- Planificación financiera
-- Inversiones y financiamiento"""
+RECUERDA: SOLO RESPONDE A TEMAS FINANCIEROS O ECONÓMICOS. PARA CUALQUIER OTRO TEMA, REDIRECCIONA AMABLEMENTE."""
             
             # Construir el prompt completo
             prompt_completo = system_prompt + "\n\n"
@@ -131,10 +171,10 @@ CONTEXTO ACTUAL DE LA EMPRESA:
 📊 Estado General: {resultados['estado_general']}
 
 INDICADORES FINANCIEROS ACTUALES:
-• Ratio de Endeudamiento: {resultados['indicadores']['ratio_endeudamiento']:.2f} ({resultados['evaluacion']['endeudamiento']})
-• Rentabilidad (ROA): {resultados['indicadores']['rentabilidad']:.2%} ({resultados['evaluacion']['rentabilidad']}) 
-• Productividad: ${resultados['indicadores']['productividad']:,.0f} por empleado ({resultados['evaluacion']['productividad']})
-• Rotación de Cartera: {resultados['indicadores']['rotacion_cartera']:.0f} días ({resultados['evaluacion']['rotacion']})
+- Ratio de Endeudamiento: {resultados['indicadores']['ratio_endeudamiento']:.2f} ({resultados['evaluacion']['endeudamiento']})
+- Rentabilidad (ROA): {resultados['indicadores']['rentabilidad']:.2%} ({resultados['evaluacion']['rentabilidad']}) 
+- Productividad: ${resultados['indicadores']['productividad']:,.0f} por empleado ({resultados['evaluacion']['productividad']})
+- Rotación de Cartera: {resultados['indicadores']['rotacion_cartera']:.0f} días ({resultados['evaluacion']['rotacion']})
 
 Usa estos datos para personalizar tus respuestas y dar consejos específicos.
 """
@@ -145,7 +185,7 @@ Usa estos datos para personalizar tus respuestas y dar consejos específicos.
                 if tipo_mensaje == "conversacional":
                     prompt_completo += f"\n\nTIPO DE MENSAJE: Conversacional general (saludo, cortesía). Responde normalmente y luego dirige hacia temas financieros."
                 else:
-                    prompt_completo += f"\n\nTIPO DE MENSAJE: No financiero. Responde brevemente y con amabilidad, pero recuerda que tu especialidad son las finanzas. Guía la conversación de vuelta a temas financieros."
+                    prompt_completo += f"\n\nTIPO DE MENSAJE: No financiero. IMPORTANTE: Responde BREVEMENTE explicando que solo puedes hablar de temas FINANCIEROS, y sugiere algunos temas financieros sobre los que puedes ayudar."
             
             # Añadir mensaje del usuario
             prompt_completo += f"\n\nUSUARIO: {mensaje}\n\nFINANZGPT (responde en español de forma excepcional):"
@@ -177,6 +217,13 @@ Usa estos datos para personalizar tus respuestas y dar consejos específicos.
                     if self._detectar_ingles(respuesta):
                         return self._respuesta_premium_espanol(mensaje, contexto_empresa, es_tema_financiero)
                     
+                    # Verificar que sea respuesta financiera para temas no financieros
+                    if not es_tema_financiero and tipo_mensaje != "conversacional":
+                        # Si la respuesta parece entrar en el tema no financiero, forzar respuesta estándar
+                        for tema in self.temas_prohibidos:
+                            if tema in respuesta.lower() and tema not in self.temas_financieros:
+                                return self._respuesta_no_financiera(mensaje)
+                    
                     return respuesta
                 else:
                     return self._respuesta_premium_espanol(mensaje, contexto_empresa, es_tema_financiero)
@@ -191,6 +238,7 @@ Usa estos datos para personalizar tus respuestas y dar consejos específicos.
     def es_mensaje_financiero(self, mensaje):
         """
         Determina si un mensaje está relacionado con temas financieros.
+        Mejora la detección con análisis más profundo.
         
         Args:
             mensaje (str): El mensaje del usuario
@@ -201,12 +249,18 @@ Usa estos datos para personalizar tus respuestas y dar consejos específicos.
         mensaje_lower = mensaje.lower()
         palabras = mensaje_lower.split()
         
+        # Primero verificar temas prohibidos explícitamente
+        for tema in self.temas_prohibidos:
+            if tema in mensaje_lower:
+                # Si contiene tema prohibido, definitivamente no es financiero
+                return False, "no_financiero"
+        
         # Detectar saludos y conversación casual
         for palabra in self.palabras_conversacionales:
             if palabra in mensaje_lower:
                 return False, "conversacional"
         
-        # Detectar temas financieros
+        # Detectar temas financieros (prioridad más alta)
         for tema in self.temas_financieros:
             if tema in mensaje_lower:
                 return True, "financiero"
@@ -220,13 +274,18 @@ Usa estos datos para personalizar tus respuestas y dar consejos específicos.
     
     def _detectar_ingles(self, texto):
         """Detecta si la respuesta está en inglés."""
-        palabras_ingles = ['the', 'is', 'are', 'what', 'how', 'financial', 'company', 'and', 'or', 'but']
-        contador = sum(1 for palabra in palabras_ingles if palabra in texto.lower().split())
+        palabras_ingles = ['the', 'is', 'are', 'what', 'how', 'financial', 'company', 'and', 'or', 'but', 'this', 'that']
+        contador = sum(1 for palabra in palabras_ingles if ' ' + palabra + ' ' in ' ' + texto.lower() + ' ')
         return contador >= 3
     
     def _respuesta_premium_espanol(self, mensaje, contexto_empresa=None, es_tema_financiero=True):
         """Respuestas premium en español cuando falla Gemini."""
         mensaje_lower = mensaje.lower().strip()
+        
+        # Verificar si es un tema prohibido
+        for tema in self.temas_prohibidos:
+            if tema in mensaje_lower:
+                return self._respuesta_no_financiera(mensaje)
         
         # SALUDOS
         if any(saludo in mensaje_lower for saludo in ['hola', 'hi', 'hey', 'buenas', 'saludos']):
@@ -235,11 +294,11 @@ Usa estos datos para personalizar tus respuestas y dar consejos específicos.
 Soy FinanzGPT, tu asistente financiero personal de última generación. Estoy aquí para hacer que las finanzas de tu empresa sean claras, comprensibles y sobre todo, mejorables.
 
 Puedo ayudarte con:
-• 📊 Análisis profundo de indicadores financieros
-• 💡 Estrategias personalizadas de mejora
-• 📈 Planes de crecimiento sostenible
-• 💰 Optimización de recursos y costos
-• 🎯 Decisiones basadas en datos
+- 📊 Análisis profundo de indicadores financieros
+- 💡 Estrategias personalizadas de mejora
+- 📈 Planes de crecimiento sostenible
+- 💰 Optimización de recursos y costos
+- 🎯 Decisiones basadas en datos
 
 ¿Qué aspecto de tu empresa te gustaría analizar hoy? ¿O prefieres que empecemos con un diagnóstico general?"""
         
@@ -286,10 +345,10 @@ Piensa en mí como tu CFO virtual personal. Mi misión es democratizar el conoci
             return """¡Hasta pronto! 👋 Ha sido un verdadero placer conversar contigo.
 
 Recuerda que estaré aquí 24/7 cuando necesites:
-• Analizar nuevos indicadores
-• Revisar estrategias financieras
-• Tomar decisiones importantes
-• O simplemente charlar sobre el futuro de tu empresa
+- Analizar nuevos indicadores
+- Revisar estrategias financieras
+- Tomar decisiones importantes
+- O simplemente charlar sobre el futuro de tu empresa
 
 ¡Mucho éxito con tu negocio! 🚀 Espero verte pronto por aquí.
 
@@ -311,13 +370,13 @@ Estoy aquí para ayudarte de manera profesional y constructiva. ¿Hay algún pro
 
 A veces, hablar sobre los desafíos financieros puede aliviar mucho el estrés. ¿Qué te parece si empezamos de nuevo? Cuéntame qué te preocupa."""
         
-        # PREGUNTAS FINANCIERAS CON CONTEXTO
-        if contexto_empresa and 'resultados' in contexto_empresa:
-            return self._respuesta_contextual_premium(mensaje, contexto_empresa)
-        
         # RESPUESTAS PARA TEMAS NO FINANCIEROS
         if not es_tema_financiero:
             return self._respuesta_no_financiera(mensaje)
+        
+        # PREGUNTAS FINANCIERAS CON CONTEXTO
+        if contexto_empresa and 'resultados' in contexto_empresa:
+            return self._respuesta_contextual_premium(mensaje, contexto_empresa)
         
         # RESPUESTA GENERAL INTELIGENTE
         return """Interesante consulta. Como tu asistente financiero especializado, puedo ayudarte mejor si me das un poco más de contexto sobre lo que necesitas.
@@ -347,78 +406,20 @@ A veces, hablar sobre los desafíos financieros puede aliviar mucho el estrés. 
 Cuéntame más sobre lo que necesitas y te daré la mejor asesoría posible."""
     
     def _respuesta_no_financiera(self, mensaje):
-        """Genera respuestas para temas no financieros, manteniendo siempre el enfoque financiero."""
-        mensaje_lower = mensaje.lower()
-        
-        # Lista de temas prohibidos a los que siempre responderemos con una redirección completa
-        temas_prohibidos = [
-            # Comida y recetas
-            'receta', 'cocina', 'comida', 'desayuno', 'almuerzo', 'cena', 'plato', 'cocinado', 'cocinar',
-            'ingrediente', 'hornear', 'freír', 'asar', 'sopa', 'ensalada', 'postre', 'postres',
-            # Temas médicos detallados
-            'medicamento', 'medicina', 'tratamiento', 'enfermedad', 'síntoma', 'diagnóstico', 'cura',
-            # Viajes y reservas específicos
-            'hotel', 'reserva', 'vuelo', 'hospedaje', 'alojamiento', 'itinerario', 'ruta turística',
-            # Relaciones personales
-            'amor', 'divorcio', 'cita', 'matrimonio', 'novia', 'novio', 'pareja', 'ruptura', 'relación',
-            # Entretenimiento específico
-            'película', 'serie', 'episodio', 'canción', 'cantante', 'actor', 'actriz', 'director',
-            # Deportes específicos
-            'jugador', 'equipo', 'gol', 'campeonato', 'mundial', 'liga', 'partido', 'marcador',
-            # Tecnología detallada
-            'instalar', 'configurar', 'hardware', 'software', 'videojuego', 'consola'
-        ]
-        
-        # Verificar si el mensaje contiene algún tema prohibido
-        if any(palabra in mensaje_lower for palabra in temas_prohibidos):
-            return """Aprecio tu interés en este tema, pero como asistente financiero especializado, mi área de experiencia se centra exclusivamente en finanzas, economía y negocios. 
+        """Genera respuestas para temas no financieros, SIEMPRE redirigiendo a temas financieros."""
+        return """Aprecio tu interés en este tema, pero como asistente financiero especializado, mi área de experiencia se centra exclusivamente en finanzas, economía y negocios. 
 
-Aunque me encantaría ayudarte con esta consulta específica, te puedo ser mucho más útil en temas como:
+Puedo ser mucho más útil en temas como:
 
-• 📊 Análisis financiero empresarial
-• 💰 Gestión de presupuestos personales
-• 📈 Estrategias de inversión
-• 🏦 Productos bancarios y crediticios
-• 💼 Valoración de empresas y activos
-• 📑 Impuestos y planificación fiscal
-• 💸 Control de gastos y ahorro
+- 📊 Análisis financiero empresarial
+- 💰 Gestión de presupuestos personales
+- 📈 Estrategias de inversión
+- 🏦 Productos bancarios y crediticios
+- 💼 Valoración de empresas y activos
+- 📑 Impuestos y planificación fiscal
+- 💸 Control de gastos y ahorro
 
 ¿Te gustaría que exploremos alguno de estos temas financieros? ¿O quizás tienes alguna otra consulta relacionada con finanzas o economía en la que pueda ayudarte hoy?"""
-        
-        # Para otros temas generales no financieros, pero no prohibidos
-        # Clima/Tiempo
-        if any(palabra in mensaje_lower for palabra in ['clima', 'lluvia', 'temperatura', 'soleado', 'frío', 'calor']):
-            return """El clima puede afectar muchos aspectos de nuestro día, ¡sin duda! 
-
-Hablando de pronósticos, ¿sabías que las proyecciones financieras funcionan de manera similar a los pronósticos del tiempo? Ambos analizan patrones históricos para predecir tendencias futuras.
-
-¿Te gustaría que analicemos las "proyecciones climáticas" de tu empresa para los próximos meses? Puedo ayudarte a preparar escenarios financieros para diferentes condiciones de mercado."""
-
-        # Tecnología/Gadgets - respuesta menos detallada
-        elif any(palabra in mensaje_lower for palabra in ['teléfono', 'telefono', 'móvil', 'movil', 'celular', 'computadora', 'pc', 'laptop', 'tablet', 'gadget']):
-            return """La tecnología avanza rapidísimo y tiene un impacto directo en nuestras finanzas. 
-
-Desde una perspectiva financiera, podríamos analizar:
-• El retorno de inversión (ROI) de adquisiciones tecnológicas
-• Estrategias para financiar compras de tecnología
-• Modelos de depreciación para equipos tecnológicos
-• Presupuestos para actualización de tecnología empresarial
-
-¿Te gustaría que exploremos alguno de estos aspectos financieros relacionados con la tecnología?"""
-
-        # Respuesta genérica para cualquier otro tema no financiero
-        return """Aprecio tu pregunta, aunque debo mencionar que mi especialidad son las finanzas y temas empresariales. 
-
-Puedo ofrecerte una orientación mucho más valiosa en temas como:
-• Análisis de rentabilidad de tu negocio
-• Estrategias para reducir costos operativos
-• Optimización de estructura financiera
-• Evaluación de inversiones y proyectos
-• Proyecciones financieras y presupuestos
-• Gestión de riesgos financieros
-• Valoración de empresas y activos
-
-¿Hay alguno de estos temas en los que pueda asistirte? Estoy aquí para ayudarte a tomar mejores decisiones financieras."""
     
     def _respuesta_contextual_premium(self, mensaje, contexto_empresa):
         """Respuestas premium cuando hay contexto de empresa."""
@@ -435,9 +436,9 @@ Puedo ofrecerte una orientación mucho más valiosa en temas como:
             respuesta = f"""## 💰 Análisis Detallado de Endeudamiento - {nombre}
 
 **Situación Actual:**
-• Ratio de endeudamiento: **{ratio:.2f}**
-• Evaluación sectorial: **{eval}**
-• Sector de referencia: **{sector}**
+- Ratio de endeudamiento: **{ratio:.2f}**
+- Evaluación sectorial: **{eval}**
+- Sector de referencia: **{sector}**
 
 ### 📊 ¿Qué significa tu ratio de {ratio:.2f}?
 
@@ -449,11 +450,11 @@ Puedo ofrecerte una orientación mucho más valiosa en temas como:
 Por cada $100 en activos, tienes ${ratio*100:.0f} en deudas. Esto es excelente porque:
 
 ✅ **Ventajas de tu posición actual:**
-• Mantienes independencia financiera
-• Los bancos te ven como cliente premium
-• Tienes capacidad para nuevas inversiones
-• Tu riesgo financiero es bajo
-• Puedes negociar mejores tasas de interés
+- Mantienes independencia financiera
+- Los bancos te ven como cliente premium
+- Tienes capacidad para nuevas inversiones
+- Tu riesgo financiero es bajo
+- Puedes negociar mejores tasas de interés
 
 ### 💡 Estrategias para Maximizar tu Ventaja:
 
@@ -477,11 +478,11 @@ Por cada $100 en activos, tienes ${ratio*100:.0f} en deudas. Esto es excelente p
 Por cada $100 en activos, debes ${ratio*100:.0f}. Esto requiere atención urgente porque:
 
 ⚠️ **Riesgos de tu situación actual:**
-• Vulnerabilidad ante cambios del mercado
-• Dificultad para obtener nuevo financiamiento
-• Altos costos financieros que erosionan rentabilidad
-• Menor flexibilidad operativa
-• Posible presión de acreedores
+- Vulnerabilidad ante cambios del mercado
+- Dificultad para obtener nuevo financiamiento
+- Altos costos financieros que erosionan rentabilidad
+- Menor flexibilidad operativa
+- Posible presión de acreedores
 
 ### 🚨 Plan de Acción Inmediato:
 
@@ -543,9 +544,9 @@ Por cada $100 en activos, debes ${ratio*100:.0f}. Esto requiere atención urgent
             respuesta = f"""## 📈 Análisis Integral de Rentabilidad - {nombre}
 
 **Performance Financiero:**
-• ROA (Retorno sobre Activos): **{rent:.1%}**
-• Evaluación sectorial: **{eval}**
-• Benchmark del sector: **{sector}**
+- ROA (Retorno sobre Activos): **{rent:.1%}**
+- Evaluación sectorial: **{eval}**
+- Benchmark del sector: **{sector}**
 
 ### 🎯 Interpretación de tu ROA {rent:.1%}:
 
@@ -559,11 +560,11 @@ Tu empresa genera **${rent*100:.2f}** de beneficio por cada **$100** invertidos 
 ¡Felicitaciones! Estás en el top 20% del sector {sector}. Esto demuestra:
 
 ✅ **Fortalezas identificadas:**
-• Gestión eficiente de recursos
-• Modelo de negocio altamente rentable
-• Ventaja competitiva sostenible
-• Excelente control de costos
-• Estrategia de precios acertada
+- Gestión eficiente de recursos
+- Modelo de negocio altamente rentable
+- Ventaja competitiva sostenible
+- Excelente control de costos
+- Estrategia de precios acertada
 
 ### 📊 Análisis Comparativo:
 
@@ -598,11 +599,11 @@ Tu empresa genera **${rent*100:.2f}** de beneficio por cada **$100** invertidos 
 Tu ROA está por debajo del promedio del sector {sector}. Análisis detallado:
 
 ⚠️ **Problemas detectados:**
-• Ineficiencia en uso de activos
-• Márgenes de beneficio comprometidos
-• Posibles activos improductivos
-• Estructura de costos inflada
-• Competencia más eficiente
+- Ineficiencia en uso de activos
+- Márgenes de beneficio comprometidos
+- Posibles activos improductivos
+- Estructura de costos inflada
+- Competencia más eficiente
 
 ### 🔍 Diagnóstico por Componentes:
 
@@ -666,9 +667,9 @@ Tu ROA está por debajo del promedio del sector {sector}. Análisis detallado:
             respuesta = f"""## 👥 Análisis de Productividad Laboral - {nombre}
 
 **Métricas de Eficiencia:**
-• Productividad por empleado: **${prod:,.0f} COP**
-• Evaluación sectorial: **{eval}**
-• Benchmark del sector: **{sector}**
+- Productividad por empleado: **${prod:,.0f} COP**
+- Evaluación sectorial: **{eval}**
+- Benchmark del sector: **{sector}**
 
 ### 📊 ¿Qué significa tu productividad de ${prod:,.0f}?
 
@@ -682,11 +683,11 @@ Cada empleado genera en promedio ${prod:,.0f} COP en ingresos anuales.
 ¡Excelente gestión del talento humano! Tu equipo está entre los más productivos del sector {sector}.
 
 ✅ **Fortalezas identificadas:**
-• Personal altamente capacitado
-• Procesos eficientes y optimizados
-• Tecnología bien implementada
-• Cultura de alto rendimiento
-• Liderazgo efectivo
+- Personal altamente capacitado
+- Procesos eficientes y optimizados
+- Tecnología bien implementada
+- Cultura de alto rendimiento
+- Liderazgo efectivo
 
 ### 💪 Ventajas Competitivas:
 
@@ -723,11 +724,11 @@ Cada empleado genera en promedio ${prod:,.0f} COP en ingresos anuales.
 Tu equipo está generando menos valor que el promedio del sector {sector}. 
 
 ⚠️ **Áreas de mejora detectadas:**
-• Procesos ineficientes o burocráticos
-• Falta de herramientas adecuadas
-• Capacitación insuficiente
-• Posible desmotivación
-• Estructura organizacional deficiente
+- Procesos ineficientes o burocráticos
+- Falta de herramientas adecuadas
+- Capacitación insuficiente
+- Posible desmotivación
+- Estructura organizacional deficiente
 
 ### 🔍 Diagnóstico Detallado:
 
@@ -906,10 +907,10 @@ Puedo profundizar en:
 **Estado General: {resultados['estado_general']}**
 
 **Indicadores Clave:**
-• 💰 Endeudamiento: {resultados['indicadores']['ratio_endeudamiento']:.2f} ({resultados['evaluacion']['endeudamiento']})
-• 📈 Rentabilidad: {resultados['indicadores']['rentabilidad']:.1%} ({resultados['evaluacion']['rentabilidad']})
-• 👥 Productividad: ${resultados['indicadores']['productividad']:,.0f}/empleado ({resultados['evaluacion']['productividad']})
-• 📅 Rotación: {resultados['indicadores']['rotacion_cartera']:.0f} días ({resultados['evaluacion']['rotacion']})
+- 💰 Endeudamiento: {resultados['indicadores']['ratio_endeudamiento']:.2f} ({resultados['evaluacion']['endeudamiento']})
+- 📈 Rentabilidad: {resultados['indicadores']['rentabilidad']:.1%} ({resultados['evaluacion']['rentabilidad']})
+- 👥 Productividad: ${resultados['indicadores']['productividad']:,.0f}/empleado ({resultados['evaluacion']['productividad']})
+- 📅 Rotación: {resultados['indicadores']['rotacion_cartera']:.0f} días ({resultados['evaluacion']['rotacion']})
 
 **Mi recomendación principal:**
 {self._obtener_recomendacion_principal(resultados)}
@@ -931,10 +932,10 @@ Puedo profundizar en:
 
 Su empresa demuestra un desempeño financiero excepcional, ubicándose en el percentil 90 del sector. Esta posición privilegiada refleja:
 
-• **Gestión de Clase Mundial:** Todos los indicadores superan ampliamente los benchmarks sectoriales
-• **Modelo de Negocio Robusto:** Alta eficiencia operativa y rentabilidad sostenible
-• **Ventaja Competitiva Clara:** Difícil de replicar por competidores
-• **Base para Expansión:** Condiciones ideales para crecimiento agresivo
+- **Gestión de Clase Mundial:** Todos los indicadores superan ampliamente los benchmarks sectoriales
+- **Modelo de Negocio Robusto:** Alta eficiencia operativa y rentabilidad sostenible
+- **Ventaja Competitiva Clara:** Difícil de replicar por competidores
+- **Base para Expansión:** Condiciones ideales para crecimiento agresivo
 
 **Estrategia Recomendada:** Capitalizar esta posición para consolidar liderazgo de mercado y explorar oportunidades de expansión disruptiva."""
         
@@ -943,10 +944,10 @@ Su empresa demuestra un desempeño financiero excepcional, ubicándose en el per
 
 Su empresa mantiene un desempeño sólido con un área específica de optimización. Esta situación estratégica presenta:
 
-• **Fundamentos Sanos:** La mayoría de indicadores en niveles óptimos
-• **Oportunidad Clara:** Un área específica con potencial de mejora significativo
-• **Riesgo Controlado:** Situación manejable sin comprometer estabilidad
-• **Potencial de Crecimiento:** Quick wins disponibles para alcanzar excelencia
+- **Fundamentos Sanos:** La mayoría de indicadores en niveles óptimos
+- **Oportunidad Clara:** Un área específica con potencial de mejora significativo
+- **Riesgo Controlado:** Situación manejable sin comprometer estabilidad
+- **Potencial de Crecimiento:** Quick wins disponibles para alcanzar excelencia
 
 **Estrategia Recomendada:** Focalizar recursos en el área de mejora identificada mientras se mantienen las fortalezas actuales."""
         
@@ -955,10 +956,10 @@ Su empresa mantiene un desempeño sólido con un área específica de optimizaci
 
 Su empresa presenta un balance entre fortalezas y áreas de mejora. Este punto de inflexión requiere:
 
-• **Priorización Inteligente:** Identificar qué mejorar primero para máximo impacto
-• **Gestión de Recursos:** Balancear inversiones entre mantener fortalezas y corregir debilidades
-• **Visión Integral:** Abordar mejoras de forma sistémica, no aislada
-• **Momentum Crítico:** Momento decisivo para definir trayectoria futura
+- **Priorización Inteligente:** Identificar qué mejorar primero para máximo impacto
+- **Gestión de Recursos:** Balancear inversiones entre mantener fortalezas y corregir debilidades
+- **Visión Integral:** Abordar mejoras de forma sistémica, no aislada
+- **Momentum Crítico:** Momento decisivo para definir trayectoria futura
 
 **Estrategia Recomendada:** Plan integral de transformación con fases bien definidas y métricas claras de éxito."""
         
@@ -967,10 +968,10 @@ Su empresa presenta un balance entre fortalezas y áreas de mejora. Este punto d
 
 Multiple indicadores requieren intervención urgente. Aunque desafiante, esta situación presenta una oportunidad única de transformación:
 
-• **Urgencia Máxima:** Necesidad de acción inmediata y decisiva
-• **Potencial Oculto:** Margen significativo de mejora en todas las áreas
-• **Transformación Total:** Oportunidad de reinventar el modelo de negocio
-• **Resiliencia Probada:** El hecho de continuar operando demuestra fortaleza fundamental
+- **Urgencia Máxima:** Necesidad de acción inmediata y decisiva
+- **Potencial Oculto:** Margen significativo de mejora en todas las áreas
+- **Transformación Total:** Oportunidad de reinventar el modelo de negocio
+- **Resiliencia Probada:** El hecho de continuar operando demuestra fortaleza fundamental
 
 **Estrategia Recomendada:** Plan de turnaround agresivo con hitos a corto plazo y transformación profunda del modelo operativo."""
     
@@ -1191,20 +1192,20 @@ Multiple indicadores requieren intervención urgente. Aunque desafiante, esta si
     def _generar_escenario_conservador(self, resultados):
         """Genera proyección conservadora."""
         return f"""Con mejoras incrementales y gestión prudente:
-• Endeudamiento: {resultados['indicadores']['ratio_endeudamiento']*0.95:.2f} (-5%)
-• Rentabilidad: {resultados['indicadores']['rentabilidad']*1.1:.1%} (+10%)
-• Productividad: ${resultados['indicadores']['productividad']*1.05:,.0f} (+5%)
-• Rotación: {resultados['indicadores']['rotacion_cartera']*0.95:.0f} días (-5%)
+- Endeudamiento: {resultados['indicadores']['ratio_endeudamiento']*0.95:.2f} (-5%)
+- Rentabilidad: {resultados['indicadores']['rentabilidad']*1.1:.1%} (+10%)
+- Productividad: ${resultados['indicadores']['productividad']*1.05:,.0f} (+5%)
+- Rotación: {resultados['indicadores']['rotacion_cartera']*0.95:.0f} días (-5%)
 
 **Resultado esperado:** Mejora gradual pero sostenible en todos los indicadores."""
     
     def _generar_escenario_optimista(self, resultados):
         """Genera proyección optimista."""
         return f"""Con implementación agresiva de todas las recomendaciones:
-• Endeudamiento: {resultados['indicadores']['ratio_endeudamiento']*0.75:.2f} (-25%)
-• Rentabilidad: {resultados['indicadores']['rentabilidad']*1.5:.1%} (+50%)
-• Productividad: ${resultados['indicadores']['productividad']*1.3:,.0f} (+30%)
-• Rotación: {resultados['indicadores']['rotacion_cartera']*0.7:.0f} días (-30%)
+- Endeudamiento: {resultados['indicadores']['ratio_endeudamiento']*0.75:.2f} (-25%)
+- Rentabilidad: {resultados['indicadores']['rentabilidad']*1.5:.1%} (+50%)
+- Productividad: ${resultados['indicadores']['productividad']*1.3:,.0f} (+30%)
+- Rotación: {resultados['indicadores']['rotacion_cartera']*0.7:.0f} días (-30%)
 
 **Resultado esperado:** Transformación significativa posicionando a la empresa como líder del sector."""
     

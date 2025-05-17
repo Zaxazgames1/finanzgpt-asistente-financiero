@@ -5,6 +5,7 @@ from models.analisis import ResultadoAnalisis
 class ConversationalAnalyzer:
     """
     Maneja la recopilación de datos de manera conversacional
+    y asegura que las respuestas estén enfocadas EXCLUSIVAMENTE en temas financieros
     """
     def __init__(self, analizador_financiero, nlp_service):
         self.analizador_financiero = analizador_financiero
@@ -31,6 +32,44 @@ class ConversationalAnalyzer:
         
         if 'datos_recopilados' not in st.session_state:
             st.session_state.datos_recopilados = {}
+        
+        # Lista ampliada de temas prohibidos (tomar de nlp_service para mantener consistencia)
+        self.temas_prohibidos = [
+            # Comida y recetas
+            'receta', 'cocina', 'comida', 'desayuno', 'almuerzo', 'cena', 'plato', 'cocinado', 'cocinar',
+            'ingrediente', 'hornear', 'freír', 'asar', 'sopa', 'ensalada', 'postre', 'postres', 'restaurante',
+            'bebida', 'café', 'té', 'pizza', 'hamburguesa', 'pastel', 'panadería', 'repostería',
+            # Temas médicos detallados
+            'medicamento', 'medicina', 'tratamiento', 'enfermedad', 'síntoma', 'diagnóstico', 'cura',
+            'doctor', 'médico', 'hospital', 'clínica', 'farmacia', 'receta médica', 'cirugía', 'operación',
+            'terapia', 'rehabilitación', 'salud', 'virus', 'bacteria', 'antibiótico', 'vacuna',
+            # Viajes y reservas específicos
+            'hotel', 'reserva', 'vuelo', 'hospedaje', 'alojamiento', 'itinerario', 'ruta turística',
+            'turismo', 'vacaciones', 'viaje', 'tour', 'aeropuerto', 'avión', 'crucero', 'destino',
+            'turista', 'playa', 'montaña', 'camping', 'mochilero', 'pasaporte', 'visa',
+            # Relaciones personales
+            'amor', 'divorcio', 'cita', 'matrimonio', 'novia', 'novio', 'pareja', 'ruptura', 'relación',
+            'boda', 'compromiso', 'anillo', 'romance', 'coqueteo', 'familia', 'hijo', 'hija', 'hermano',
+            'hermana', 'padre', 'madre', 'tío', 'tía', 'abuelo', 'abuela', 'primo', 'prima',
+            # Entretenimiento específico
+            'película', 'serie', 'episodio', 'canción', 'cantante', 'actor', 'actriz', 'director',
+            'cine', 'teatro', 'música', 'concierto', 'festival', 'baile', 'danza', 'libro', 'novela',
+            'autor', 'escritor', 'poeta', 'poesía', 'lectura', 'videojuego', 'juego', 'consola',
+            # Deportes específicos
+            'jugador', 'equipo', 'gol', 'campeonato', 'mundial', 'liga', 'partido', 'marcador',
+            'fútbol', 'baloncesto', 'tenis', 'béisbol', 'golf', 'atletismo', 'natación', 'gimnasio',
+            'ejercicio', 'entrenamiento', 'competición', 'medalla', 'récord', 'estadio', 'cancha',
+            # Tecnología detallada
+            'instalar', 'configurar', 'hardware', 'software', 'videojuego', 'consola', 'dispositivo',
+            'smartphone', 'laptop', 'tablet', 'ordenador', 'computadora', 'programación', 'código',
+            'desarrollo', 'app', 'aplicación', 'sistema operativo', 'red', 'internet', 'wifi',
+            # Otros temas alejados de finanzas
+            'noticia', 'política', 'religión', 'historia', 'filosofía', 'ciencia', 'arte', 'cultura',
+            'idioma', 'lenguaje', 'gramática', 'traducción', 'educación', 'escuela', 'universidad',
+            'moda', 'ropa', 'estilo', 'belleza', 'maquillaje', 'cosmética', 'hogar', 'decoración',
+            'jardinería', 'limpieza', 'mascotas', 'animales', 'películas', 'tv', 'chatgpt', 'inteligencia artificial',
+            'robot', 'gemini', 'poesía', 'chiste', 'broma', 'anime', 'videojuegos', 'cuento'
+        ]
     
     def detectar_intencion_analisis(self, mensaje):
         """Detecta si el usuario quiere iniciar un análisis"""
@@ -48,7 +87,16 @@ class ConversationalAnalyzer:
         return any(palabra in mensaje_lower for palabra in palabras_clave_analisis)
     
     def detectar_intencion_tema_no_financiero(self, mensaje):
-        """Detecta si el usuario está preguntando sobre un tema no financiero"""
+        """
+        Detecta si el usuario está preguntando sobre un tema no financiero
+        Versión mejorada para ser más estricta
+        """
+        # Verificar si hay temas prohibidos explícitamente
+        mensaje_lower = mensaje.lower()
+        for tema in self.temas_prohibidos:
+            if tema in mensaje_lower:
+                return True, "prohibido"
+                
         # Usar el método del servicio NLP para determinar si es un tema financiero
         es_financiero, tipo = self.nlp_service.es_mensaje_financiero(mensaje)
         return not es_financiero, tipo
@@ -60,37 +108,19 @@ class ConversationalAnalyzer:
         estado_actual = st.session_state.estado_conversacion
         
         # Detectar temas prohibidos directamente y responder con redirección
-        temas_prohibidos = [
-            # Comida y recetas
-            'receta', 'cocina', 'comida', 'desayuno', 'almuerzo', 'cena', 'plato', 'cocinado', 'cocinar',
-            'ingrediente', 'hornear', 'freír', 'asar', 'sopa', 'ensalada', 'postre', 'postres',
-            # Temas médicos detallados
-            'medicamento', 'medicina', 'tratamiento', 'enfermedad', 'síntoma', 'diagnóstico', 'cura',
-            # Viajes y reservas específicos
-            'hotel', 'reserva', 'vuelo', 'hospedaje', 'alojamiento', 'itinerario', 'ruta turística',
-            # Relaciones personales
-            'amor', 'divorcio', 'cita', 'matrimonio', 'novia', 'novio', 'pareja', 'ruptura', 'relación',
-            # Entretenimiento específico
-            'película', 'serie', 'episodio', 'canción', 'cantante', 'actor', 'actriz', 'director',
-            # Deportes específicos
-            'jugador', 'equipo', 'gol', 'campeonato', 'mundial', 'liga', 'partido', 'marcador',
-            # Tecnología detallada
-            'instalar', 'configurar', 'hardware', 'software', 'videojuego', 'consola'
-        ]
-        
         mensaje_lower = mensaje.lower()
-        if any(tema in mensaje_lower for tema in temas_prohibidos):
+        if any(tema in mensaje_lower for tema in self.temas_prohibidos):
             return """Aprecio tu interés en este tema, pero como asistente financiero especializado, mi área de experiencia se centra exclusivamente en finanzas, economía y negocios. 
 
 Aunque me encantaría ayudarte con esta consulta específica, te puedo ser mucho más útil en temas como:
 
-• 📊 Análisis financiero empresarial
-• 💰 Gestión de presupuestos personales
-• 📈 Estrategias de inversión
-• 🏦 Productos bancarios y crediticios
-• 💼 Valoración de empresas y activos
-• 📑 Impuestos y planificación fiscal
-• 💸 Control de gastos y ahorro
+- 📊 Análisis financiero empresarial
+- 💰 Gestión de presupuestos personales
+- 📈 Estrategias de inversión
+- 🏦 Productos bancarios y crediticios
+- 💼 Valoración de empresas y activos
+- 📑 Impuestos y planificación fiscal
+- 💸 Control de gastos y ahorro
 
 ¿Te gustaría que exploremos alguno de estos temas financieros? ¿O quizás tienes alguna otra consulta relacionada con finanzas o economía en la que pueda ayudarte hoy?"""
         
@@ -469,37 +499,19 @@ Intenta de nuevo:"""
     def _manejar_completado(self, mensaje):
         """Maneja consultas después del análisis"""
         # Detectar temas prohibidos directamente y responder con redirección
-        temas_prohibidos = [
-            # Comida y recetas
-            'receta', 'cocina', 'comida', 'desayuno', 'almuerzo', 'cena', 'plato', 'cocinado', 'cocinar',
-            'ingrediente', 'hornear', 'freír', 'asar', 'sopa', 'ensalada', 'postre', 'postres',
-            # Temas médicos detallados
-            'medicamento', 'medicina', 'tratamiento', 'enfermedad', 'síntoma', 'diagnóstico', 'cura',
-            # Viajes y reservas específicos
-            'hotel', 'reserva', 'vuelo', 'hospedaje', 'alojamiento', 'itinerario', 'ruta turística',
-            # Relaciones personales
-            'amor', 'divorcio', 'cita', 'matrimonio', 'novia', 'novio', 'pareja', 'ruptura', 'relación',
-            # Entretenimiento específico
-            'película', 'serie', 'episodio', 'canción', 'cantante', 'actor', 'actriz', 'director',
-            # Deportes específicos
-            'jugador', 'equipo', 'gol', 'campeonato', 'mundial', 'liga', 'partido', 'marcador',
-            # Tecnología detallada
-            'instalar', 'configurar', 'hardware', 'software', 'videojuego', 'consola'
-        ]
-        
         mensaje_lower = mensaje.lower()
-        if any(tema in mensaje_lower for tema in temas_prohibidos):
+        if any(tema in mensaje_lower for tema in self.temas_prohibidos):
             return """Aprecio tu interés en este tema, pero como asistente financiero especializado, mi área de experiencia se centra exclusivamente en finanzas, economía y negocios. 
 
 Aunque me encantaría ayudarte con esta consulta específica, te puedo ser mucho más útil en temas como:
 
-• 📊 Análisis financiero empresarial
-• 💰 Gestión de presupuestos personales
-• 📈 Estrategias de inversión
-• 🏦 Productos bancarios y crediticios
-• 💼 Valoración de empresas y activos
-• 📑 Impuestos y planificación fiscal
-• 💸 Control de gastos y ahorro
+- 📊 Análisis financiero empresarial
+- 💰 Gestión de presupuestos personales
+- 📈 Estrategias de inversión
+- 🏦 Productos bancarios y crediticios
+- 💼 Valoración de empresas y activos
+- 📑 Impuestos y planificación fiscal
+- 💸 Control de gastos y ahorro
 
 ¿Te gustaría que exploremos alguno de estos temas financieros? ¿O quizás tienes alguna otra consulta relacionada con finanzas o economía en la que pueda ayudarte hoy?"""
             
